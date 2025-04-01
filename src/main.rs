@@ -12,13 +12,43 @@ struct Args {
     output_dir: PathBuf,
 }
 
+fn count_files(input_dir: &PathBuf) -> u128 {
+    let mut count: u128 = 0;
+    for entry in WalkDir::new(input_dir) {
+        let entry = entry.unwrap();
+        if entry.file_type().is_file() {
+            count += 1;
+        }
+    }
+    count
+}
+
+fn copy_all(input_dir: PathBuf, output_dir: PathBuf) -> Result<(), ()> {
+    for entry in WalkDir::new(input_dir).contents_first(true) {
+        let entry = entry.unwrap();
+        if entry.file_type().is_file() {
+            //WARNING the filenames of photos are not unique outside directories,
+            //so maybe append on the foldername?
+            let output_path = &output_dir.join(entry.file_name());
+            if output_path.exists() {
+                // TODO Find a more graceful way to exit or queue up these errored files...
+                panic!("The file {} already exists!", output_path.to_str().unwrap());
+            }
+            let _copy_result = std::fs::copy(entry.into_path(), output_path);
+        }
+    }
+    Ok(())
+}
+
 fn main() {
     let args = Args::parse();
-    for entry in WalkDir::new(args.input_dir).contents_first(true) {
-        let entry = entry.unwrap();
-        println!("{}", entry.path().display());
-        // TODO copy each entry that isn't a directory to the output_dir argument.
-        // Check for a method of the DirEntry class to check if it's a directory.
-        // Maybe create a progress bar output?
-    }
+    let input_dir = args.input_dir;
+    let output_dir = args.output_dir;
+    println!("Analyzing input directory...");
+    let count = count_files(&input_dir);
+    println!(
+        "Found {} files. Beginning copy operations",
+        count.to_string()
+    );
+    let _copy_all_result = copy_all(input_dir, output_dir);
 }
