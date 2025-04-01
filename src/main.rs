@@ -27,8 +27,8 @@ fn count_files(input_dir: &PathBuf) -> u64 {
         }
     }
 
-    thread::sleep(Duration::from_millis(10000)); //TODO Remove this, just to test a progress bar. 
-    spinner.finish_with_message(format!("Found {} files", &count));
+    thread::sleep(Duration::from_millis(3000)); //TODO Remove this, just to test a progress bar. 
+    spinner.finish_and_clear();
     count
 }
 
@@ -60,7 +60,7 @@ fn copy_all(
     Ok(())
 }
 
-fn main() -> Result<(), std::io::Error> {
+fn run() -> Result<(), std::io::Error> {
     let args = Args::parse();
     let input_dir = args.input_dir;
     let output_dir = args.output_dir;
@@ -76,4 +76,11 @@ fn main() -> Result<(), std::io::Error> {
     let count = count_files(&input_dir);
     let copy_all_result = copy_all(input_dir, output_dir, count);
     return copy_all_result;
+}
+
+fn main() {
+    if let Err(e) = run() {
+        eprintln!("Error: {}", e);
+        std::process::exit(1)
+    }
 }
