@@ -33,5 +33,5 @@ Options:
 - [X] Copy all files to single output directory
 - [X] Show progress bar
 - [X] Add a "filter" optional argument
+- [x] Rename and open source this repo on github as "flatten"
 - [ ] Functionalize the "walkdir" used twice in the same main.rs...
-- [ ] Rename and open source this repo on github as "flatten"
